@@ -6,7 +6,7 @@ export const Top: FC<{ messages: string[] }> = (props: {
 }) => {
   return (
     <Layout>
-      <h1>Hello Hono!</h1>
+      <h1 className="text-3xl font-bold underline">Hello Hono!</h1>
       <ul>
         {props.messages.map((message) => {
           return <li>{message}!!</li>;
