@@ -4,11 +4,14 @@ import { Hono } from "hono";
 import { Top } from "./components/top";
 import sequelize from "./database";
 import weaviate from "weaviate-client";
+import { render } from "hono/jsx/dom";
 
 const app = new Hono();
 
 app.get("/", (c) => c.text("Hello from hono!"));
-app.get("/react", (c) => c.html(<Top messages={["Hello", "World"]} />));
+app.get("/react", (c) => {
+  return c.html(<Top messages={["Hello", "World"]} />);
+});
 
 const connectDB = async () => {
   let retries = 5;
