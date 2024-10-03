@@ -5,7 +5,7 @@ COPY yarn.lock ./
 COPY . .
 RUN yarn install
 
-ENV PORT 8080
-EXPOSE 8080
+ENV PORT 3010
+EXPOSE 3010
 ENTRYPOINT ["yarn"]
 CMD ["start"]

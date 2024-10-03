@@ -3,6 +3,7 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { Top } from "./components/top";
 import sequelize from "./database";
+import weaviate from "weaviate-client";
 
 const app = new Hono();
 
@@ -28,8 +29,30 @@ const connectDB = async () => {
   }
 };
 
+const connectWeaviate = async () => {
+  let retries = 5;
+  await new Promise((res) => setTimeout(res, 5000)); // wait 5 seconds before trying to connect
+  while (retries) {
+    try {
+      const client = await weaviate.connectToLocal({
+        host: "weaviate",
+        port: 8080,
+      });
+      console.log("Connected to the weaviate.");
+      break;
+    } catch (error) {
+      console.error("Unable to connect to the weaviate:", error);
+      console.log(error);
+      retries -= 1;
+      console.log(`Retries left: ${retries}`);
+      await new Promise((res) => setTimeout(res, 5000)); // wait 5 seconds
+    }
+  }
+};
+
 const start = async () => {
   await connectDB();
+  await connectWeaviate();
   serve(
     {
       fetch: app.fetch,
