@@ -6,20 +6,24 @@
   "repository": "git@github.com:simaonogueira101/JuampAI.git",
   "author": "Francisco Leal <francisco@talentprotocol.com>",
   "license": "MIT",
+  "type": "module",
   "scripts": {
-    "dev": "tsx watch index.tsx",
-    "start": "node dist/index.js",
+    "dev": "vite",
+    "build": "vite build --mode client && vite build",
     "postinstall": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@hono/node-server": "^1.12.0",
+    "@hono/vite-dev-server": "^0.16.0",
+    "@types/pdf-parse": "^1.1.4",
     "dotenv": "^16.4.5",
     "hono": "^4.4.13",
     "luxon": "^3.4.4",
     "mysql2": "^3.11.3",
     "pdf-parse": "^1.1.1",
     "sequelize": "^6.37.3",
+    "vite": "^5.4.8",
     "weaviate-client": "^3.1.5"
   },
   "devDependencies": {

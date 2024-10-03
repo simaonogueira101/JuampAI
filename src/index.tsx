@@ -1,17 +1,32 @@
-import { config } from "./config";
-import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { Top } from "./components/top";
-import sequelize from "./database";
+import sequelize from "../database";
 import weaviate from "weaviate-client";
-import { render } from "hono/jsx/dom";
 
 const app = new Hono();
 
-app.get("/", (c) => c.text("Hello from hono!"));
-app.get("/react", (c) => {
-  return c.html(<Top messages={["Hello", "World"]} />);
-});
+app.get('*', (c) => {
+  return c.html(
+    <html>
+      <head>
+        <meta charSet="utf-8" />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        
+        <title>JuampAI</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        
+        {import.meta.env.PROD ? (
+          <script type="module" src="/static/client.js"></script>
+        ) : (
+          <script type="module" src="/src/client.tsx"></script>
+        )}
+      </head>
+
+      <body>
+        <div id="root"></div>
+      </body>
+    </html>
+  )
+})
 
 const connectDB = async () => {
   let retries = 5;
@@ -56,15 +71,8 @@ const connectWeaviate = async () => {
 const start = async () => {
   await connectDB();
   await connectWeaviate();
-  serve(
-    {
-      fetch: app.fetch,
-      port: config.server.port,
-    },
-    (info) => {
-      console.log(`Server listening on ${info.port}`);
-    }
-  );
 };
 
 start();
+
+export default app;

@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3010:3010"
+      - "5173:5173"
     environment:
       - DB_HOST=mysql
       - DB_USER=root

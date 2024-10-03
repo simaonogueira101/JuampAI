@@ -1,11 +1,13 @@
 FROM node:lts-alpine
+
+WORKDIR /app
  
 COPY package.json ./
 COPY yarn.lock ./
 COPY . .
 RUN yarn install
 
-ENV PORT 3010
-EXPOSE 3010
+ENV PORT 5173
+EXPOSE 5173
 ENTRYPOINT ["yarn"]
-CMD ["start"]
+CMD ["dev"]
