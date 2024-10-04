@@ -1,6 +1,9 @@
 import weaviate from "weaviate-client";
+import { configure, vectorizer } from "weaviate-client";
 import fs from "fs";
-import pdf from "pdf-parse";
+// pdf-parse package is not maintained and has some issues with TypeScript compatibility
+// @ts-ignore
+import pdf from 'pdf-parse/lib/pdf-parse'
 import "dotenv/config";
 
 const chunkText = (text: string, chunkSize = 100) => {
@@ -21,12 +24,9 @@ const chunkText = (text: string, chunkSize = 100) => {
 };
 
 export const seedWeaviate = async () => {
-  const client = await weaviate.connectToLocal({
-    host: "weaviate",
-    port: 8080,
-  });
+  const client = await weaviate.connectToLocal();
 
-  const dataBuffer = fs.readFileSync("../data/talent-protocol-docs.pdf");
+  const dataBuffer = fs.readFileSync("./data/talent-protocol-docs.pdf");
 
   const data = await pdf(dataBuffer);
   console.log(data.text);
@@ -34,13 +34,20 @@ export const seedWeaviate = async () => {
   console.log(chunks);
 
   try {
+    const collections = await client.collections.listAll();
+    const collectionExists = collections.some(
+      (collection: any) => collection.name === "PDFSection"
+    );
+
+    if (collectionExists) {
+      await client.collections.delete("PDFSection");
+      console.log("Existing collection deleted successfully");
+    }
+
     await client.collections.create({
       name: "PDFSection",
-      vectorizers: weaviate.configure.vectorizer.text2VecCohere({
-        model: "embed-multilingual-v3.0",
-        sourceProperties: ["content"],
-      }),
-      generative: weaviate.configure.generative.openAI(),
+      vectorizers: vectorizer.text2VecOpenAI(),
+      generative: configure.generative.openAI(),
       properties: [
         {
           name: "content",
@@ -57,14 +64,15 @@ export const seedWeaviate = async () => {
       ],
     });
     console.log("Collection created successfully");
+    
   } catch (error) {
-    console.error("Error creating collection:", error);
+    console.error("Error managing collections:", error);
   }
 
   const myCollection = client.collections.get("PDFSection");
   const response = await myCollection.data.insertMany(chunks);
 
   if (response.hasErrors) {
-    console.error(response.errors);
+    console.error("Errors: ", response.errors);
   }
 };
