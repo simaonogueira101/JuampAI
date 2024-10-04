@@ -2,7 +2,7 @@ import { FC } from 'hono/jsx';
 
 export const DataSourceInfo: FC = () => {
   return (
-    <div className="bg-gray-800 p-4 w-full mx-auto">
+    <div className="bg-gray-800 p-4 w-full mx-auto flex flex-col flex-row">
       <div className="text-white font-bold mb-4">Connection</div>
       <div className="bg-gray-600 p-3 flex items-center space-x-4">
         {/* Placeholder for logo */}
