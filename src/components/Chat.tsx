@@ -25,6 +25,7 @@ export const Chat: FC = () => {
   ]);
 
   const [inputValue, setInputValue] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const addMessage = (content: string) => {
@@ -32,9 +33,11 @@ export const Chat: FC = () => {
   };
 
   useEffect(() => {
-    if (messages.length > 0 && messages[messages.length - 1].sender === 'human') {      
+    if (messages.length > 0 && messages[messages.length - 1].sender === 'human') {
+      setLoading(true);
       fetchAIResponse(messages).then((response) => {
         setMessages((prevMessages) => [...prevMessages, { sender: 'ai', content: response }]);
+        setLoading(false);
       });
     }
   }, [messages]);
@@ -57,6 +60,9 @@ export const Chat: FC = () => {
         {messages.map((msg, index) => (
           <Message sender={msg.sender} content={msg.content} />
         ))}
+        {loading && (
+          <Message sender={"ai"} content={"..."} />
+        )}
         <div ref={messagesEndRef} />
       </div>
       <div className="flex mt-4">

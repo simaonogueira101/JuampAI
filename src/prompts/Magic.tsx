@@ -10,6 +10,7 @@ import { createHistoryAwareRetriever } from "langchain/chains/history_aware_retr
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 import { createRetrievalChain } from "langchain/chains/retrieval";
 import { AIMessage, HumanMessage } from "@langchain/core/messages";
+import { WeaviateHybridRetriever } from "./Retriever";
 
 interface Message {
   sender: 'ai' | 'human';
@@ -44,8 +45,10 @@ async function makeMagicHappen(apiKey: string, messages: Message[]) {
     "Given a chat history and the latest user question " +
     "which might reference context in the chat history, " +
     "formulate a standalone question which can be understood " +
-    "without the chat history. Do NOT answer the question, " +
-    "just reformulate it if needed and otherwise return it as is.";
+    "by a semantic and vector search engine without the chat " +
+    "history. After the question, include the most relevant " +
+    "keywords. Do NOT answer the question, just reformulate it " +
+    "if needed and otherwise return it as is.";
 
   const contextualizeQPrompt = ChatPromptTemplate.fromMessages([
     ["system", contextualizeQSystemPrompt],
@@ -53,9 +56,7 @@ async function makeMagicHappen(apiKey: string, messages: Message[]) {
     ["human", "{input}"],
   ]);
 
-  const retriever = vectorStore.asRetriever({
-    k: 4,
-  });
+  const retriever = new WeaviateHybridRetriever({verbose: false});
 
   const historyAwareRetriever = await createHistoryAwareRetriever({
     llm,
@@ -64,11 +65,14 @@ async function makeMagicHappen(apiKey: string, messages: Message[]) {
   });
 
   const systemPrompt =
-    "You are an assistant for question-answering tasks. " +
+    "You are Talent Protocol's Developer Relations AI Assistant. " +
+    "Your name is JuampAI. You have access to TP's docs here: " +
+    "https://docs.talentprotocol.com/docs." +
     "Use the following pieces of retrieved context to answer " +
     "the question. If you don't know the answer, say that you " +
-    "don't know. Use three sentences maximum and keep the " +
-    "answer concise." +
+    "don't know. You MUST return the answer in Markdown, especially " +
+    "if if includes code snippets. Make use of paragraphs and bullet " +
+    "points to improve readability. " +
     "\n\n" +
     "{context}";
 

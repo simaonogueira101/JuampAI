@@ -1,4 +1,5 @@
 import { FC } from 'hono/jsx';
+import markdownit from 'markdown-it'
 
 interface MessageProps {
   sender: 'ai' | 'human';
@@ -7,6 +8,9 @@ interface MessageProps {
 
 const Message: FC<MessageProps> = ({ sender, content }) => {
   const isAI = sender === 'ai';
+
+  const md = markdownit()
+  const markdownContent = md.render(content);
 
   return (
     <div className={`flex ${isAI ? 'justify-start' : 'justify-end'}`}>
@@ -19,13 +23,12 @@ const Message: FC<MessageProps> = ({ sender, content }) => {
         </div>
       )}
       <div
-        className={`p-2 px-3 mb-2 ${
+        className={`p-2 px-3 mb-2 space-y-8 [&_ul]:list-disc [&_ol]:list-decimal [&_ol]:pl-4 [&_ul]:pl-4 [&_pre]:overflow-x-auto [&_pre]:p-2 [&_pre]:text-nowrap [&_pre]:bg-gray-800 [&_pre]:text-white [&_code]:p-1 [&_code]:bg-gray-800 [&_code]:text-wrap ${
           isAI ? 'bg-blue-500 text-white' : 'bg-gray-700 text-white'
         }`}
         style={{ maxWidth: '500px' }}
-      >
-        {content}
-      </div>
+        dangerouslySetInnerHTML={{ __html: markdownContent }}
+      />
       {!isAI && (
         <div
           className="flex items-center justify-center align-center w-8 h-8 mt-1 bg-gray-800 text-white text-center rounded-full ml-2"
