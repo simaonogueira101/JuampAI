@@ -1,6 +1,6 @@
 import { FC } from 'hono/jsx';
 
-export const ConfigPage: FC = () => {
+export const Config: FC = () => {
   return (
     <h1>Configuration Page</h1>
   );

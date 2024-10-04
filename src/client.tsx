@@ -2,10 +2,11 @@ import { useState } from 'hono/jsx'
 import { render } from 'hono/jsx/dom'
 import Navigo from 'navigo'
 
+import { Layout } from './components/layout'
 import { Navbar } from './components/Navbar'
 
-import { AssistantPage } from './components/AssistantPage'
-import { ConfigPage } from './components/ConfigPage'
+import { Assistant } from './views/Assistant'
+import { Config } from './views/Config'
 
 const router = new Navigo('/')
 
@@ -18,12 +19,12 @@ function App() {
     .resolve()
 
   return (
-    <div>
+    <Layout>
       <Navbar />
 
-      {currentRoute === '/' && <AssistantPage />}
-      {currentRoute === '/config' && <ConfigPage />}
-    </div>
+      {currentRoute === '/' && <Assistant />}
+      {currentRoute === '/config' && <Config />}
+    </Layout>
   )
 }
 
