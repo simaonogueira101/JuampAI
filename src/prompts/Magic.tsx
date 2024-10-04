@@ -13,7 +13,7 @@ import { AIMessage, HumanMessage } from "@langchain/core/messages";
 import { WeaviateHybridRetriever } from "./Retriever";
 
 interface Message {
-  sender: 'ai' | 'human';
+  sender: "ai" | "human";
   content: string;
 }
 
@@ -76,13 +76,13 @@ async function makeMagicHappen(apiKey: string, messages: Message[]) {
     "\n\n" +
     "{context}";
 
-    const chatHistory = messages.map((msg) => {
-      if (msg.sender === 'human') {
-        return new HumanMessage(msg.content);
-      } else {
-        return new AIMessage(msg.content);
-      }
-    });
+  const chatHistory = messages.map((msg) => {
+    if (msg.sender === "human") {
+      return new HumanMessage(msg.content);
+    } else {
+      return new AIMessage(msg.content);
+    }
+  });
 
   const qaPrompt = ChatPromptTemplate.fromMessages([
     ["system", systemPrompt],
