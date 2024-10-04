@@ -42,6 +42,7 @@ export const Chat: FC<{ setSources: (sources: Source[]) => void }> = ({
   >([{ sender: "ai", content: "Hello! How can I assist you?" }]);
 
   const [inputValue, setInputValue] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const addMessage = (content: string) => {
@@ -60,6 +61,7 @@ export const Chat: FC<{ setSources: (sources: Source[]) => void }> = ({
           ...prevMessages,
           { sender: "ai", content: response.answer },
         ]);
+        setLoading(false);
       });
     }
   }, [messages]);
@@ -82,6 +84,9 @@ export const Chat: FC<{ setSources: (sources: Source[]) => void }> = ({
         {messages.map((msg, index) => (
           <Message sender={msg.sender} content={msg.content} />
         ))}
+        {loading && (
+          <Message sender={"ai"} content={"..."} />
+        )}
         <div ref={messagesEndRef} />
       </div>
       <div className="flex mt-4">

@@ -26,53 +26,66 @@ const chunkText = (text: string, chunkSize = 100) => {
 export const seedWeaviate = async () => {
   const client = await weaviate.connectToLocal();
 
-  const dataBuffer = fs.readFileSync("./data/talent-protocol-docs.pdf");
+  const test = await client
+    .collections
+    .get("PDFSection")
+    .query
+    .hybrid(
+      "How can I obtain an API key for Talent Protocol? \n\nKeywords: Talent Protocol, API key, obtain, access",
+      {
+        limit: 2,
+      }
+    )
+  
+  console.log(test.objects)
 
-  const data = await pdf(dataBuffer);
-  console.log(data.text);
-  const chunks = chunkText(data.text);
-  console.log(chunks);
+  // const dataBuffer = fs.readFileSync("./data/talent-protocol-docs.pdf");
 
-  try {
-    const collections = await client.collections.listAll();
-    const collectionExists = collections.some(
-      (collection: any) => collection.name === "PDFSection"
-    );
+  // const data = await pdf(dataBuffer);
+  // console.log(data.text);
+  // const chunks = chunkText(data.text);
+  // console.log(chunks);
 
-    if (collectionExists) {
-      await client.collections.delete("PDFSection");
-      console.log("Existing collection deleted successfully");
-    }
+  // try {
+  //   const collections = await client.collections.listAll();
+  //   const collectionExists = collections.some(
+  //     (collection: any) => collection.name === "PDFSection"
+  //   );
 
-    await client.collections.create({
-      name: "PDFSection",
-      vectorizers: vectorizer.text2VecOpenAI(),
-      generative: configure.generative.openAI(),
-      properties: [
-        {
-          name: "content",
-          dataType: "text",
-        },
-        {
-          name: "chunkIndex",
-          dataType: "int",
-        },
-        {
-          name: "documentId",
-          dataType: "text",
-        },
-      ],
-    });
-    console.log("Collection created successfully");
+  //   if (collectionExists) {
+  //     await client.collections.delete("PDFSection");
+  //     console.log("Existing collection deleted successfully");
+  //   }
+
+  //   await client.collections.create({
+  //     name: "PDFSection",
+  //     vectorizers: vectorizer.text2VecOpenAI(),
+  //     generative: configure.generative.openAI(),
+  //     properties: [
+  //       {
+  //         name: "content",
+  //         dataType: "text",
+  //       },
+  //       {
+  //         name: "chunkIndex",
+  //         dataType: "int",
+  //       },
+  //       {
+  //         name: "documentId",
+  //         dataType: "text",
+  //       },
+  //     ],
+  //   });
+  //   console.log("Collection created successfully");
     
-  } catch (error) {
-    console.error("Error managing collections:", error);
-  }
+  // } catch (error) {
+  //   console.error("Error managing collections:", error);
+  // }
 
-  const myCollection = client.collections.get("PDFSection");
-  const response = await myCollection.data.insertMany(chunks);
+  // const myCollection = client.collections.get("PDFSection");
+  // const response = await myCollection.data.insertMany(chunks);
 
-  if (response.hasErrors) {
-    console.error("Errors: ", response.errors);
-  }
+  // if (response.hasErrors) {
+  //   console.error("Errors: ", response.errors);
+  // }
 };
