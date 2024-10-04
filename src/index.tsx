@@ -1,8 +1,11 @@
 import { Hono } from "hono";
+import ai from "./api/ai";
 import sequelize from "../database";
 import weaviate from "weaviate-client";
 
 const app = new Hono();
+
+app.route('/ai', ai);
 
 app.get('*', (c) => {
   return c.html(
