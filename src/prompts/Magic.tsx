@@ -9,8 +9,14 @@ import {
 import { createHistoryAwareRetriever } from "langchain/chains/history_aware_retriever";
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 import { createRetrievalChain } from "langchain/chains/retrieval";
+import { AIMessage, HumanMessage } from "@langchain/core/messages";
 
-async function makeMagicHappen(apiKey: string, inputQuestion: string) {
+interface Message {
+  sender: 'ai' | 'human';
+  content: string;
+}
+
+async function makeMagicHappen(apiKey: string, messages: Message[]) {
   const llm = new ChatOpenAI({
     model: "gpt-4o",
     temperature: 0,
@@ -66,10 +72,17 @@ async function makeMagicHappen(apiKey: string, inputQuestion: string) {
     "\n\n" +
     "{context}";
 
+    const chatHistory = messages.map((msg) => {
+      if (msg.sender === 'human') {
+        return new HumanMessage(msg.content);
+      } else {
+        return new AIMessage(msg.content);
+      }
+    });
+
   const qaPrompt = ChatPromptTemplate.fromMessages([
     ["system", systemPrompt],
     new MessagesPlaceholder("chat_history"),
-    ["human", "{input}"],
   ]);
 
   const questionAnswerChain = await createStuffDocumentsChain({
@@ -82,7 +95,10 @@ async function makeMagicHappen(apiKey: string, inputQuestion: string) {
     combineDocsChain: questionAnswerChain,
   });
 
-  const response = await ragChain.invoke({ input: inputQuestion });
+  const response = await ragChain.invoke({
+    input: messages[messages.length - 1].content,
+    chat_history: chatHistory,
+  });
 
   return response;
 }
