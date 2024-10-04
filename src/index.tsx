@@ -14,7 +14,7 @@ app.get('*', (c) => {
         <meta charSet="utf-8" />
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         
-        <title>JuampAI</title>
+        <title>siuuu.dev</title>
         <script src="https://cdn.tailwindcss.com"></script>
         
         {import.meta.env.PROD ? (

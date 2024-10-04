@@ -1,79 +1,55 @@
-import { FC, useState, useEffect, useRef } from "hono/jsx";
-import Message from "./Message";
-import { Source } from "../views/Assistant";
+import { FC, useState, useEffect, useRef } from 'hono/jsx';
+import Message from './Message';
 
 const fetchAIResponse = async (
-  messages: { sender: "ai" | "human"; content: string }[]
-): Promise<{ answer: string; context: any[] }> => {
+  messages: { sender: 'ai' | 'human'; content: string }[]
+): Promise<string> => {
   const { protocol, hostname, port } = window.location;
-  const baseUrl = `${protocol}//${hostname}${port ? ":" + port : ""}`;
+  const baseUrl = `${protocol}//${hostname}${port ? ':' + port : ''}`;
 
   const formData = new FormData();
   formData.append("history", JSON.stringify(messages));
 
   const response = await fetch(baseUrl + "/ai/magic", {
-    method: "POST",
-    body: formData,
+    method: 'POST',
+    body: formData
   });
 
   const data = await response.json();
-  return data;
+  return data.answer;
 };
 
-type Context = {
-  pageContent: string;
-};
+export const Chat: FC = () => {
+  const [messages, setMessages] = useState<{ sender: 'ai' | 'human'; content: string }[]>([
+    { sender: 'ai', content: 'Hello! How can I assist you?' },
+  ]);
 
-const contextToSource = (context: Context[]): Source[] => {
-  return context.map((doc) => {
-    return {
-      url: "https://docs.talentprotocol.com",
-      title: "Talent Protocol Docs",
-      excerpt: `${doc.pageContent.substring(0, 50).trim()}...`,
-    };
-  });
-};
-
-export const Chat: FC<{ setSources: (sources: Source[]) => void }> = ({
-  setSources,
-}) => {
-  const [messages, setMessages] = useState<
-    { sender: "ai" | "human"; content: string }[]
-  >([{ sender: "ai", content: "Hello! How can I assist you?" }]);
-
-  const [inputValue, setInputValue] = useState<string>("");
+  const [inputValue, setInputValue] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const addMessage = (content: string) => {
-    setMessages([...messages, { sender: "human", content }]);
+    setMessages([...messages, { sender: 'human', content }]);
   };
 
   useEffect(() => {
-    if (
-      messages.length > 0 &&
-      messages[messages.length - 1].sender === "human"
-    ) {
+    if (messages.length > 0 && messages[messages.length - 1].sender === 'human') {
+      setLoading(true);
       fetchAIResponse(messages).then((response) => {
-        // call setSources
-        setSources(contextToSource(response.context));
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { sender: "ai", content: response.answer },
-        ]);
+        setMessages((prevMessages) => [...prevMessages, { sender: 'ai', content: response }]);
         setLoading(false);
       });
     }
   }, [messages]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
+  
   const handleSendMessage = () => {
     if (inputValue.trim()) {
       addMessage(inputValue.trim());
-      setInputValue("");
+      setInputValue('');
     }
   };
 
@@ -97,7 +73,7 @@ export const Chat: FC<{ setSources: (sources: Source[]) => void }> = ({
           value={inputValue}
           onChange={(e) => setInputValue((e.target as HTMLInputElement).value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === 'Enter') {
               handleSendMessage();
             }
           }}
@@ -105,13 +81,10 @@ export const Chat: FC<{ setSources: (sources: Source[]) => void }> = ({
         />
         <button
           className={`px-4 ${
-            inputValue.trim()
-              ? "bg-blue-500 hover:bg-blue-600 text-white"
-              : "bg-gray-500 cursor-not-allowed text-gray-400"
+            inputValue.trim() ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-gray-500 cursor-not-allowed text-gray-400'
           }`}
           onClick={handleSendMessage}
-          disabled={!inputValue.trim()}
-        >
+          disabled={!inputValue.trim()}>
           Send
         </button>
       </div>
