@@ -2,7 +2,7 @@ import { useState } from 'hono/jsx'
 import { render } from 'hono/jsx/dom'
 import Navigo from 'navigo'
 
-import { Layout } from './components/layout'
+import { Layout } from './components/Layout'
 import { Navbar } from './components/Navbar'
 
 import { Assistant } from './views/Assistant'
