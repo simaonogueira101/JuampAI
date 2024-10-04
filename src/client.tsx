@@ -1,18 +1,33 @@
 import { useState } from 'hono/jsx'
 import { render } from 'hono/jsx/dom'
+import Navigo from 'navigo'
+
+import { Navbar } from './components/Navbar'
+
+import { AssistantPage } from './components/AssistantPage'
+import { ConfigPage } from './components/ConfigPage'
+
+const router = new Navigo('/')
 
 function App() {
+  const [currentRoute, setCurrentRoute] = useState('/')
+
+  router
+    .on('/', () => setCurrentRoute('/'))
+    .on('/config', () => setCurrentRoute('/config'))
+    .resolve()
+
   return (
-    <>
-    <Counter />
-    </>
+    <div>
+      <Navbar />
+
+      {currentRoute === '/' && <AssistantPage />}
+      {currentRoute === '/config' && <ConfigPage />}
+    </div>
   )
 }
 
-function Counter() {
-  const [count, setCount] = useState(0)
-  return <button onClick={() => setCount(count + 1)}>You clicked me {count} times</button>
-}
+const root = document.getElementById('root')
+render(<App />, root!)
 
-const root = document.getElementById('root')!
-render(<App />, root)
+router.updatePageLinks()

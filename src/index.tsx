@@ -69,8 +69,8 @@ const connectWeaviate = async () => {
 };
 
 const start = async () => {
-  await connectDB();
-  await connectWeaviate();
+  // await connectDB();
+  // await connectWeaviate();
 };
 
 start();
